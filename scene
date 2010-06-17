@@ -1,0 +1,14 @@
+appearance {
+  +transparent
+  +shadelines
+  shading smooth
+  linewidth 1
+  material {
+    alpha 0.7
+  }
+}
+
+LIST
+{ < camera.skel }
+{ < trace.skel }
+{ < geometry.list }
