@@ -27,6 +27,7 @@ struct vec3
 	vec3(const vec3* v):x(v->x),y(v->y),z(v->z) {}
 	vec3(const real& X,const real& Y,const real& Z):x(X),y(Y),z(Z) {}
 	vec3(const real& val): x(val), y(val), z(val) {}
+	vec3(const real val[3]): x(val[0]), y(val[1]), z(val[2]) {}
 
 	real operator [](const unsigned int index) const{
 		assert(index <=2);

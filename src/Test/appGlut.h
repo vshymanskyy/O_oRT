@@ -33,9 +33,9 @@ public:
 	}
 
 	void Run(int argc, char** argv, fsBase* sampler, camThinLens* cam, prBase* geom) {
-		mPixelation	= 1;
-		mWidth		= 640;
-		mHeight		= 480;
+		mPixelation	= 0;
+		mWidth		= 512;
+		mHeight		= 512;
 		mCamera		= cam;
 		mGeometry	= geom;
 		mSampler	= sampler;
@@ -107,20 +107,21 @@ public:
 		} else {
 			glutReshapeWindow(mFrame->Width()*factor, mFrame->Height()*factor);
 		}
-		Render();
 		glPixelZoom (factor, factor);
+
+		Render();
+
 		glDrawPixels(mFrame->Width(), mFrame->Height(), GL_RGBA, GL_FLOAT, mFrame->Buffer());
 		glutSwapBuffers();
-		//printf("%d x %d, %d spp: %1.3f, %f RPS\n", mFrame->Width(), mFrame->Height(), mSampler->getSamples(), 1.0/mFrame->RenderTime(), mFrame->RPS());
+		printf("%d x %d, %d spp: %1.3f, %s RPS\n", mFrame->Width(), mFrame->Height(), mSampler->getSamples(), 1.0/atof(mFrame->getProperty("RenderTime")), mFrame->getProperty("RaysPerSec"));
 	}
 
 	static void Display() {
 		appGlut& app = *GetInstance();
-		const int factor = 1 << app.mPixelation;
-		glPixelZoom (factor, factor);
-		glDrawPixels(app.mFrame->Width(), app.mFrame->Height(), GL_RGBA, GL_FLOAT, app.mFrame->Buffer());
-		glFlush();
-		glutSwapBuffers();
+		//glPixelZoom (1 << app.mPixelation, 1 << app.mPixelation);
+		//glDrawPixels(app.mFrame->Width(), app.mFrame->Height(), GL_RGBA, GL_FLOAT, app.mFrame->Buffer());
+		//glFlush();
+		//glutSwapBuffers();
 	}
 
 	static void Reshape(int width, int height) {
@@ -365,6 +366,17 @@ public:
 				changed = true;
 				app.mKeyBuffer[','] = false;
 			}
+		}
+
+		if (app.mKeyBuffer['u']) {
+			if(app.mSampler->getReportProgress()) {
+				app.mSampler->setReportProgress(false);
+			} else {
+				app.mSampler->setReportProgress(true);
+			}
+
+			//changed = true;
+			app.mKeyBuffer['u'] = false;
 		}
 
 		if (changed) {

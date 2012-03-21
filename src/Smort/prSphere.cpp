@@ -1,13 +1,12 @@
 #include "prSphere.h"
 
-prSphere::prSphere(const vec3 center, real radius, shBase *mat, bool frontFace, bool backFace)
+prSphere::prSphere(const vec3 center, real radius, const shBase* MatFront, const shBase* MatBack)
 	: mCenter		(center)
 	, mNorth		(0.0, -1.0, 0.0)
 	, mEquador		(0.0, 0.0, 1.0)
 	, mRadius		(radius)
-	, mMaterial		(mat)
-	, mFrontFace	(frontFace)
-	, mBackFace		(backFace)
+	, mMaterialFront(MatFront)
+	, mMaterialBack	(MatBack)
 	, mNcrossE		(mNorth.cross(mEquador))
 	, mSqrRadius	(Square(mRadius))
 {
@@ -24,20 +23,13 @@ prSphere::Hits(const Ray &r) const
 		const real
 			i1 = b - det,
 			i2 = b + det;
-		if (i2 > real(0)) {
-			if (!mFrontFace || i1 < real(0)) {
-				if (i2 > r.dist || i2 < r.minDist || !mBackFace) {
-					return false;
-				}
+		if (i2 > r.minDist) {
+			if (mMaterialFront && i1 < r.dist && i1 > r.minDist) {
 				return true;
-			} else {
-				if (i1 > r.dist || i1 < r.minDist) {
-					return false;
-				}
+			} else if (mMaterialBack && i2 < r.dist) {
 				return true;
 			}
 		}
-		return false;
 	}
 	return false;
 }
@@ -52,21 +44,15 @@ prSphere::Intersect(Ray &r) const
 		det = det.Sqrt();
 		const real i1 = b - det;
 		const real i2 = b + det;
-		if (i2 > real(0)) {
-			if (!mFrontFace || i1 < real(0.0)) {
-				if (i2 > r.dist || i2 < r.minDist || !mBackFace) {
-					return;
-				}
-				//inside
-				r.gState.object = this;
-				r.dist = i2;
-			} else {
-				if (i1 > r.dist || i1 < r.minDist) {
-					return;
-				}
+		if (i2 > r.minDist) {
+			if (mMaterialFront && i1 < r.dist && i1 > r.minDist) {
 				//outside
 				r.gState.object = this;
 				r.dist = i1;
+			} else if (mMaterialBack && i2 < r.dist) {
+				//inside
+				r.gState.object = this;
+				r.dist = i2;
 			}
 			return;
 		}
@@ -96,7 +82,7 @@ prSphere::Shade(Ray &r, rgba* result) const
 	//r.gState.partialV = mNorth.cross(r.gState.normal);
 
 	//material
-	mMaterial->Shade(r, result);
+	(r.gState.inside ? mMaterialBack : mMaterialFront)->Shade(r, result);
 }
 
 // bool prSphere::TestPoint(vec3 &p) {

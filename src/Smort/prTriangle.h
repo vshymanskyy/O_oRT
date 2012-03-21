@@ -10,7 +10,7 @@ public:
 		const vec3& A, const vec3& B, const vec3& C,
 		const vec2& mA, const vec2& mB, const vec2& mC,
 		//const vec3& nA, const vec3& nB, const vec3& nC,
-		const shBase* MatFront, const shBase* MatBack
+		const shBase* MatFront, const shBase* MatBack = NULL
 	);
 
 	void Intersect(Ray &r) const;

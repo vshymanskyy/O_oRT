@@ -1,5 +1,6 @@
 #include "cRandom.h"
 
+#include <math.h>
 #define mtRand_N 624
 #define M 397
 #define MATRIX_A 0x9908b0df
@@ -105,7 +106,7 @@ vec3 cRandom::RandVec3() {
 	}
 
 	real cRandom::Random() {
-		return Rand();
+		return real(rand()) / real(RAND_MAX); //Rand();
 	}
 
 	vec3 cRandom::RandomVec3() {

@@ -23,11 +23,11 @@ public:
 		return (y * Width()) + x;
 	}
 
-	int Width() const {
+	unsigned Width() const {
 		return mWidth;
 	}
 
-	int Height() const {
+	unsigned Height() const {
 		return mHeight;
 	}
 
@@ -50,8 +50,8 @@ private:
 	};
 
 	rgba* mData;
-	int mWidth;
-	int mHeight;
+	unsigned mWidth;
+	unsigned mHeight;
 	bool mFlipX;
 	bool mFlipY;
 	List<Property> mProperties;

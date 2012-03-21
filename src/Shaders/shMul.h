@@ -10,7 +10,7 @@ public:
 		, mShader2(sh2)
 	{}
 
-	void Shade(Ray &r, rgba* result) const {
+	void Shade(const Ray &r, rgba* result) const {
 		rgba r2;
 		mShader1->Shade(r, result);
 		mShader2->Shade(r, &r2);

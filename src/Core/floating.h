@@ -7,11 +7,13 @@ public:
 	Floating() {}
 	Floating(const Floating& num)		: mData(num.mData) {}
 	Floating(const int& num)			: mData((base_t)num) {}
+	Floating(const unsigned& num)		: mData((base_t)num) {}
 	Floating(const float& num)			: mData((base_t)num) {}
 	Floating(const double& num)			: mData((base_t)num) {}
 	Floating(const long double& num)	: mData((base_t)num) {}
 
 	operator int()	const{	return (int)mData.value;	}
+	operator unsigned()	const{	return (unsigned)mData.value;	}
 	operator float()const{	return (float)mData.value;	}
 	operator bool()	const{	return fabs(mData.value) > base_t(0.0001);	}
 

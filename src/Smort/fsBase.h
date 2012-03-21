@@ -27,11 +27,10 @@ protected:
 			static float prevDisp = progress - 100.0f;
 			if (fabs(progress - prevDisp) >= 5.0f && mDisplayFunc) {
 				mDisplayFunc();
-				SleepMs(50);
 				prevDisp = progress;
 			}
 
-			if (fabs(progress - prev) >= 0.2f) {
+			if (fabs(progress - prev) >= 10.0f) {
 				mTimer.Stop();
 				printf("Rendering... %3.2f%% [%3.3f seconds]\r", progress, mTimer.GetDurationInSecs());
 				fflush(stdout);
@@ -50,39 +49,39 @@ public:
 
 	virtual ~fsBase() {}
 
-    bool getPostProcess() const {
-        return mPostProcess;
-    }
+	bool getPostProcess() const {
+		return mPostProcess;
+	}
 
-    List<ppBase*>& getPostProcessors() {
-        return mPostProcessors;
-    }
+	List<ppBase*>& getPostProcessors() {
+		return mPostProcessors;
+	}
 
-    bool getReportProgress() const {
-        return mReportProgress;
-    }
+	bool getReportProgress() const {
+		return mReportProgress;
+	}
 
-    int getSamples() const {
-        return mSamples;
-    }
+	int getSamples() const {
+		return mSamples;
+	}
 
-    void setPostProcess(bool mPostProcess) {
-        this->mPostProcess = mPostProcess;
-    }
+	void setPostProcess(bool mPostProcess) {
+		this->mPostProcess = mPostProcess;
+	}
 
-    void setDisplayFunc(void (*func)(void)) {
-        this->mDisplayFunc = func;
-    }
+	void setDisplayFunc(void (*func)(void)) {
+		this->mDisplayFunc = func;
+	}
 
-    void setReportProgress(bool mReportProgress) {
-        this->mReportProgress = mReportProgress;
-    }
+	void setReportProgress(bool mReportProgress) {
+		this->mReportProgress = mReportProgress;
+	}
 
-    void setSamples(int mSamples) {
-        this->mSamples = mSamples;
-    }
+	void setSamples(int mSamples) {
+		this->mSamples = mSamples;
+	}
 
-    void Render(camBase* cam, prBase* geom, HdrImage* frame) {
+	void Render(camBase* cam, prBase* geom, HdrImage* frame) {
 		mTimer.Start();
 		geom->Precompute();
 		cam->Precompute();

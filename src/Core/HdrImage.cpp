@@ -32,16 +32,15 @@ FloatToRgbe(unsigned char rgbe[4], float red, float green, float blue)
 
 static
 void
-RgbeToFloat(float *red, float *green, float *blue, unsigned char rgbe[4])
+RgbeToFloat(float *red, float *green, float *blue, unsigned char rgbe[4], float coef = 5.0)
 {
 	// note: Ward uses ldexp(col+0.5,exp-(128+8))
 	// However we wanted pixels in the range [0,1] to map back into the range [0,1].
-	float f;
 	if (rgbe[3]) {
-		f = ldexp(1.0f, rgbe[3]-(128+8));
-		*red = rgbe[0] * f;
-		*green = rgbe[1] * f;
-		*blue = rgbe[2] * f;
+		const float f = ldexp(1.0f, rgbe[3]-(128+8)) * coef;
+		*red = f * rgbe[0];
+		*green = f * rgbe[1];
+		*blue = f * rgbe[2];
 	} else {
 		*red = *green = *blue = 0.0;
 	}
@@ -300,6 +299,7 @@ HdrImage::HdrImage(int width, int height, rgba* data)
 	, mHeight	(height)
 {
 	setProperty("FORMAT", Format);
+	setSize(width, height);
 }
 
 bool
@@ -439,7 +439,7 @@ HdrImage::FlipXY()
 void
 HdrImage::setSize(int w, int h)
 {
-	if (w != mWidth || h != mHeight) {
+	if (!mData || w != mWidth || h != mHeight) {
 		mWidth = w;
 		mHeight = h;
 

@@ -17,6 +17,10 @@ public:
 	virtual aabb GetAabb() const = 0;
 
 	void Trace(Ray& r, rgba* result) const {
+		if (r.cState.depth <= 0) {
+			*result = rgba(0.0);
+			return;
+		}
 		Intersect(r);
 		Shade(r, result);
 		if (SKEL) {

@@ -13,6 +13,6 @@ public:
 	template<class T> inline static T InRange(const T& a, const T& b) {
 		return ((real)(a) + Random()*((real)(b)-(real)(a)));
 	}
-	
+
 };
 

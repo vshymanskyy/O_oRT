@@ -15,7 +15,7 @@ prTriangle::prTriangle(	const vec3& A, const vec3& B, const vec3& C,
 	, mTexB			(mB)
 	, mTexC			(mC)
 	, mMaterialFront(MatFront)
-	, mMaterialBack	(MatBack)
+	, mMaterialBack	(MatBack?MatBack:MatFront)
 {
 	edge1 = B - A;
 	edge2 = C - A;

@@ -122,6 +122,6 @@ void SleepMs (unsigned t) {
 #ifdef UNIX
 	usleep(t*1000);
 #else
-	//Sleep(t);
+	Sleep(t);
 #endif
 }

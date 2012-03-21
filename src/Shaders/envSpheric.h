@@ -13,3 +13,16 @@ public:
 private:
 	shBase* mMap;
 };
+
+class envSphericLanLon
+	: public envBase
+{
+
+public:
+	envSphericLanLon(shBase* map);
+
+	void Shade(Ray &r, rgba* result) const;
+
+private:
+	shBase* mMap;
+};

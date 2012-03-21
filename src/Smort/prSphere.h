@@ -6,7 +6,7 @@ class prSphere
 {
 
 public:
-	prSphere(const vec3 center, real radius, shBase *mat, bool frontFace = true, bool backFace = true);
+	prSphere(const vec3 center, real radius, const shBase* MatFront, const shBase* MatBack = NULL);
 
 	void Intersect(Ray &r) const;
 	bool Hits(const Ray &r) const;
@@ -21,9 +21,8 @@ private:
 	const vec3		mEquador;
 	const real		mRadius;
 
-	const shBase*	mMaterial;
-	const bool		mFrontFace;
-	const bool		mBackFace;
+	const shBase*	mMaterialFront;
+	const shBase*	mMaterialBack;
 	// -- end representation
 
 	const vec3 mNcrossE;

@@ -3,6 +3,8 @@
 #undef assert
 #define assert(x)
 
+#include "../defines.h"
+
 struct rgba {
 
 	channel r, g, b, a;
