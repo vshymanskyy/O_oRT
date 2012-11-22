@@ -1,7 +1,8 @@
-#Wed Mar 24 16:59:21 EET 2010
 activeContentFilterList=*.makefile,makefile,*.Makefile,Makefile,Makefile.*,*.mk,MANIFEST.MF
+addNewLine=true
 convertActionOnSaave=AnyEdit.CnvrtTabToSpaces
 eclipse.preferences.version=1
+ignoreBlankLinesWhenTrimming=false
 inActiveContentFilterList=
 javaTabWidthForJava=true
 org.eclipse.jdt.ui.editor.tab.width=2
