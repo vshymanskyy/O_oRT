@@ -6,7 +6,7 @@ prSphere::prSphere(const vec3 center, real radius, const shBase* MatFront, const
 	, mEquador		(0.0, 0.0, 1.0)
 	, mRadius		(radius)
 	, mMaterialFront(MatFront)
-	, mMaterialBack	(MatBack)
+	, mMaterialBack	(MatBack?MatBack:MatFront)
 	, mNcrossE		(mNorth.cross(mEquador))
 	, mSqrRadius	(Square(mRadius))
 {

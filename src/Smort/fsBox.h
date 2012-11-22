@@ -53,15 +53,17 @@ public:
 								pixel = rgba(0.0);
 								channel weight(0.0);
 
+								Ray ray(geom);
+								rgba col;
+
 								for (real sx = -half_samples; sx < half_samples; sx += real(1)) {
 									for (real sy = -half_samples; sy < half_samples; sy += real(1)) {
 										const real sub_x =  sample_step * real(sx) + cRandom::InRange(-half_sample_step, half_sample_step);
 										const real sub_y = sample_step * real(sy) + cRandom::InRange(-half_sample_step, half_sample_step);
 										//const channel curWeight = channel(flt.getWeight(vec2(sub_x, sub_y)));
 
-										Ray ray(geom);
-										rgba col;
 										cam->getRay(real(0.5 + x) + sub_x, real(0.5 + y) + sub_y, &ray);
+										ray.Clear();
 										geom->Trace(ray, &col);
 										samples++;
 										pixel += col;// * curWeight;

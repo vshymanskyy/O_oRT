@@ -50,7 +50,7 @@ extern class skel* SKEL;
 	typedef Fixed<int32_t, int64_t, 20> real;
 #else
 	#include "floating.h"
-	typedef Floating<double> real;
+	typedef Floating<float> real;
 #endif
 
 typedef float channel;

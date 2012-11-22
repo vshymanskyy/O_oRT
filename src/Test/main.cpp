@@ -36,7 +36,6 @@
 #include "modAffineUV.h"
 
 #include "shCheckered.h"
-#include "shWavelet.h"
 #include "shPerlin.h"
 #include "shPerlinImproved.h"
 #include "shMarble.h"
@@ -44,6 +43,7 @@
 #include "shHdrImage.h"
 #include "shMirror.h"
 #include "shGlass.h"
+#include "shRaster.h"
 
 #include "shAbs.h"
 #include "shAdd.h"
@@ -166,14 +166,17 @@ int main(int argc, char** args) {
 	signal(SIGTERM, onAbort);
 	signal(SIGINT,  onAbort);
 
+	shRaster* face = new shRaster("face.png");
+
 	sceneBruteForce* a = new sceneBruteForce(
 	//	new envConst(1.0)
-	//	new envCubic(new shConst(1.0, 0.0, 0.0), new shConst(0.0, 1.0, 0.0), new shConst(0.0, 0.0, 1.0), new shConst(1.0, 1.0, 0.0), new shConst(1.0, 0.0, 1.0), new shConst(0.0, 1.0, 1.0))
-		new envSphericLanLon(new shHdrImage("/media/Transcend/Resources/environments/equirectangular/OpenfootageNET_Beach_CavalinoItalyHigh.hdr"))
+	//	new envCubic( new shConst(1.0, 0.0, 0.0), new shConst(0.0, 1.0, 0.0), new shConst(0.0, 0.0, 1.0), new shConst(1.0, 1.0, 0.0), new shConst(1.0, 0.0, 1.0), new shConst(0.0, 1.0, 1.0))
+		new envCubic(face, face, face, face, face, face)
+	//	new envSphericLanLon(new shHdrImage("/media/Transcend/Resources/environments/equirectangular/OpenfootageNET_Beach_CavalinoItalyHigh.hdr"))
 	);
 
 
-	const float scale = 7.0;
+	const float scale = 14.0;
 	const float radius = 3.0;
 	const vec3 centers[27] = {
 			{0.0*scale,  0.0*scale, 0.0*scale},
@@ -207,7 +210,7 @@ int main(int argc, char** args) {
 
 
 	int pos = 0;
-	/*a->Add(new prSphere(centers[pos++], radius, new shMirror(new shConst(0.8))));
+	a->Add(new prSphere(centers[pos++], radius, new shMirror(new shConst(0.8))));
 	a->Add(new prSphere(centers[pos++], radius, new shReflect(new shConst(0.8))));
 	a->Add(new prSphere(centers[pos++], radius, new shTrace(new shNormal())));
 	a->Add(new prSphere(centers[pos++], radius, new shCheckered(1.0, 0.05)));
@@ -218,22 +221,21 @@ int main(int argc, char** args) {
 	a->Add(new prSphere(centers[pos++], radius, new shRefract(new shConst(0.8), new shConst(1.33))));
 	a->Add(new prSphere(centers[pos++], radius, new shPerlinImproved()));
 	a->Add(new prSphere(centers[pos++], radius, new shPerlin()));
-	//a->Add(new prSphere(centers[pos++], radius, new shWavelet()));
 	a->Add(new prSphere(centers[pos++], radius, new shAbs(new shNormal())));
 	a->Add(new prSphere(centers[pos++], radius, new shTurbulence(new shCheckered(0.1, 0.1), 10, 1, 0.5)));
 	a->Add(new prSphere(centers[pos++], radius, new shWood(new shPerlinImproved(), 0, 15, 2)));
 	a->Add(new prSphere(centers[pos++], radius, new shMarble(new shPerlinImproved(), 0, 4, 3)));
-	//a->Add(new prSphere(centers[pos++], radius, new shBlend(new shConst(1.0), new shReflect(new shConst(0.8)), new shPerlinImproved())));
+	a->Add(new prSphere(centers[pos++], radius, new shBlend(new shConst(1.0), new shReflect(new shConst(0.8)), new shPerlinImproved())));
 	a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.8), new shAdd(new shAbs(new shPerlin()), new shConst(1.0)))));
-	//a->Add(new prSphere(centers[pos++], radius, new modGlossy(new shMirror(new shConst(0.8)), new shConst(0.05))));*/
-	//a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.8, 0.8, 0.8), new shBlend(new shConst(1.3), new shConst(1.7), new shAbs(new shPerlinImproved())))));
-	//a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.85, 0.85, 0.85), new shAdd(new shAbs(new shPerlin()), new shConst(1.0)))));
-	//a->Add(new prSphere(centers[pos++], radius, new shMirror(new shBlend(new shConst(0.8), new shConst(0.4), new shCheckered(1.0, 1.0)))));
+	a->Add(new prSphere(centers[pos++], radius, new modGlossy(new shMirror(new shConst(0.8)), new shConst(0.05))));
+	a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.8, 0.8, 0.8), new shBlend(new shConst(1.3), new shConst(1.7), new shAbs(new shPerlinImproved())))));
+	a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.85, 0.85, 0.85), new shAdd(new shAbs(new shPerlin()), new shConst(1.0)))));
+	a->Add(new prSphere(centers[pos++], radius, new shMirror(new shBlend(new shConst(0.8), new shConst(0.4), new shCheckered(1.0, 1.0)))));
 
-	shBase* glass = new shGlass(new shConst(1.0, 1.0, 1.0), new shConst(1.7));
+	//shBase* glass = new shGlass(new shConst(1.0, 1.0, 1.0), new shConst(1.7));
 
-	for(int i=0; i<27; i++)
-		a->Add(new prSphere(centers[pos++], radius, glass, glass));
+	//for(int i=0; i<27; i++)
+	//	a->Add(new prSphere(centers[pos++], radius, glass, glass));
 
 	//a->Add(new prSphere(centers[pos++], radius, new shReflect(new shConst(0.05))));
 
@@ -247,19 +249,13 @@ int main(int argc, char** args) {
 	//addBox(a, vec3(-2.0, -2.0, -2.0), vec3(2.0, 2.0, 2.0), sh1, sh1);
 	//addBox(a, vec3(-1.8, -1.8, -1.8), vec3(1.8, 1.8, 1.8), sh2, sh2);
 
-
-
 	//shBase* shColorChecks = new shBlend(new shConst(0.8, 1.0, 0.0), new shConst(0.5, 0.0, 0.5), new shCheckered(1.0, 1.0));
-	shBase* shColorChecks = new shCheckered(1.0, 1.0);
-	shBase* shMirrorColorChecks = new shMirror(shColorChecks);
-	shBase* shGlossyMirrorColorChecks = new modGlossy(shMirrorColorChecks, new shConst(0.1));
+	//shBase* shColorChecks = new shCheckered(1.0, 1.0);
+	//shBase* shMirrorColorChecks = new shMirror(shColorChecks);
+	//shBase* shGlossyMirrorColorChecks = new modGlossy(shMirrorColorChecks, new shConst(0.1));
 
 
-
-
-	//tshConst2< tshConst<CONST_D, CONST_D, CONST_D> > shader_;
-
-	//shBase* shFloor = new shGlass(new shConst(0.8), new shConst(1.33), new shConst(0.0), new shConst(100));
+	//shBase* shFloor = new shGlass(new shConst(1.0), new shConst(1.33), new shConst(0.0), new shConst(50));
 	//shBase* shFloor = new shAbs(new shNormal());
 	//shBase* shFloor = new shCheckered(.1, .1);
 

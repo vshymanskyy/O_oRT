@@ -1,14 +1,22 @@
 #pragma once
 #include "shBase.h"
 
-template <class Coef>
-class shReflect {
+class shReflect
+	: public shBase
+{
+
+private:
+	const shBase* mCoeficient;
 
 public:
-	shReflect();
-	static void Shade(const Ray &r, rgba* result) {
+	shReflect(const shBase* coef)
+		: mCoeficient(coef)
+	{
+	}
+
+	void Shade(const Ray &r, rgba* result) const {
 		rgba Kr;
-		Coef::Shade(r, &Kr);
+		mCoeficient->Shade(r, &Kr);
 		if (Kr.Luminance() > channel(0.0)) {
 			const vec3 reflDir = r.dir + r.gState.normal * r.gState.cosND * real(2.0);
 			Ray rayRefl(r.scene, r.gState.point, reflDir, r.cState.depth-1, r.parent);

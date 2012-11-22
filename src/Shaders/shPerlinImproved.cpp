@@ -1,7 +1,7 @@
 #include "shPerlinImproved.h"
 
 static float fade(float t) {
-	return t * t * t * (t * (t * 6 - 15) + 10);
+	return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 }
 
 static float lerp(float t, float a, float b) {

@@ -3,7 +3,8 @@
 #include <cmath>
 #include <cstring>
 
-rgba shRaster::GetPixel(int x,int y) const{
+rgba shRaster::GetPixel(int x,int y) const
+{
 	int index = bpp*(y*Width+x);
 	index = cMath::ClampRange(index,0,bpp*Width*Height-1);
 	switch (bpp) {
@@ -20,7 +21,9 @@ rgba shRaster::GetPixel(int x,int y) const{
 	return rgba();
 }
 
-shRaster::shRaster(const char *fn,const FilteringMethod Filter) :filter(Filter) {
+shRaster::shRaster(const char *fn, const FilteringMethod Filter)
+	: filter(Filter)
+{
 	ILuint name;
 	static bool ilInitialized = false;
 	if (!ilInitialized) {
@@ -42,32 +45,28 @@ shRaster::shRaster(const char *fn,const FilteringMethod Filter) :filter(Filter) 
 	data	= new ILubyte[dataSize];
 	memcpy(data,ilGetData(),dataSize);
 	ilDeleteImages(1,&name);
-	
+
 }
 
-#define cubic(t)	((t)*(t)*(cMath::Three-cMath::Two*(t)))
+#define cubic(t)	((t)*(t)*(real(3.0)-real(2.0)*(t)))
 
-rgba shRaster::Shade(Ray &r) const{
+void shRaster::Shade (const Ray &r, rgba* result) const
+{
 	const real
-		x = r.gState.UV.x.Abs()*real(Width),
-		y = r.gState.UV.y.Abs()*real(Height);
+		x = r.gState.textureUV.x.Abs()*real(Width),
+		y = r.gState.textureUV.y.Abs()*real(Height);
 	switch(filter) {
 		case (FM_NONE):{
-			return GetPixel((int)(x)%Width,(int)(y)%Height);
-		}case (FM_NEAREST):{
-
-		}case (FM_LINEAR):{
-
-		}case (FM_BILINEAR):{
+			*result = GetPixel((int)(x)%Width,(int)(y)%Height);
+		} case (FM_BILINEAR):{
 			const real
-				mx = floor(x),
-				my = floor(y),
-				x1 = fmod(mx, Width),
-				y1 = fmod(my, Height);
+				mx = x.Floor(),
+				my = y.Floor(),
+				x1 = mx.Mod(Width),
+				y1 = my.Mod(Height);
 			real
-				x2 = x1 + cMath::One,
-				y2 = y1 + cMath::One;
-
+				x2 = x1 + real(1.0),
+				y2 = y1 + real(1.0);
 			{
 				real tmp(Width-1);
 				if (x2 > tmp)
@@ -80,22 +79,23 @@ rgba shRaster::Shade(Ray &r) const{
 			const real
 				fx = x-mx,
 				fy = y-my,
-				ifx = cMath::One-fx,
-				ify = cMath::One-fy;
-			return
+				ifx = real(1.0)-fx,
+				ify = real(1.0)-fy;
+			*result =
 				GetPixel((int)(x1),(int)(y1))*(ifx*ify)+
 				GetPixel((int)(x2),(int)(y1))*(fx*ify)+
 				GetPixel((int)(x1),(int)(y2))*(ifx*fy)+
 				GetPixel((int)(x2),(int)(y2))*(fx*fy);
-		}case (FM_BICUBIC):{
+			break;
+		} case (FM_BICUBIC):{
 			const real
-				mx = floor(x),
-				my = floor(y),
-				x1 = fmod(mx, Width),
-				y1 = fmod(my, Height);
+				mx = x.Floor(),
+				my = y.Floor(),
+				x1 = mx.Mod(Width),
+				y1 = my.Mod(Height);
 			real
-				x2 = x1 + cMath::One,
-				y2 = y1 + cMath::One;
+				x2 = x1 + real(1.0),
+				y2 = y1 + real(1.0);
 
 			{
 				real tmp(Width-1);
@@ -109,15 +109,17 @@ rgba shRaster::Shade(Ray &r) const{
 			const real
 				fx = cubic(x-mx),
 				fy = cubic(y-my),
-				ifx = cMath::One-fx,
-				ify = cMath::One-fy;
-			return
+				ifx = real(1.0)-fx,
+				ify = real(1.0)-fy;
+			*result =
 				GetPixel((int)(x1),(int)(y1))*(ifx*ify)+
 				GetPixel((int)(x2),(int)(y1))*(fx*ify)+
 				GetPixel((int)(x1),(int)(y2))*(ifx*fy)+
 				GetPixel((int)(x2),(int)(y2))*(fx*fy);
-		}default:{
-			return GetPixel((int)(x)%Width,(int)(y)%Height);
+			break;
+		} default:{
+			*result = GetPixel((int)(x)%Width,(int)(y)%Height);
+			break;
 		}
 	}
 }

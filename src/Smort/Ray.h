@@ -37,6 +37,12 @@ struct Ray {
 	void UpdatePoint();
 
 	void UpdateNormal();
+
+	void Clear() {
+		dist = cMath::Huge;
+		cState.depth = NR_BOUNCES;
+		gState.object = NULL;
+	}
 };
 
 inline

@@ -1,6 +1,6 @@
 #pragma once
 #include "shBase.h"
-#include "..\..\Dependencies\DevIL\include\il.h"
+#include <IL/il.h>
 
 class shRaster: public shBase{
 private:
@@ -26,7 +26,7 @@ public:
 
 	shRaster(const char *fn,const FilteringMethod Filter = FM_BICUBIC);
 
-	rgba Shade(Ray &r) const;
+	void Shade (const Ray &r, rgba* result) const;
 
 	~shRaster();
 };

@@ -16,6 +16,7 @@ private:
 	int mPixelation;
 	int mWidth, mHeight;
 	int	mPosX, mPosY;
+	bool mNeedRender;
 
 	camThinLens* mCamera;
 	prBase* mGeometry;
@@ -24,9 +25,6 @@ private:
 
 public:
 
-	appGlut() {}
-	~appGlut() {}
-
 	static appGlut* GetInstance() {
 		static appGlut* inst = new appGlut();
 		return inst;
@@ -34,8 +32,8 @@ public:
 
 	void Run(int argc, char** argv, fsBase* sampler, camThinLens* cam, prBase* geom) {
 		mPixelation	= 0;
-		mWidth		= 512;
-		mHeight		= 512;
+		mWidth		= 800;
+		mHeight		= 600;
 		mCamera		= cam;
 		mGeometry	= geom;
 		mSampler	= sampler;
@@ -98,6 +96,9 @@ public:
 	void setFrameSize(int w, int h){
 		mFrame->setSize(w, h);
 		mCamera->setFrameSize(w, h);
+		mCamera->mViewSize.x = 1.0;
+		mCamera->mViewSize.y = real(h)/real(w);
+		mCamera->Precompute();
 	}
 
 	void Update(bool resize = true) {
@@ -114,14 +115,15 @@ public:
 		glDrawPixels(mFrame->Width(), mFrame->Height(), GL_RGBA, GL_FLOAT, mFrame->Buffer());
 		glutSwapBuffers();
 		printf("%d x %d, %d spp: %1.3f, %s RPS\n", mFrame->Width(), mFrame->Height(), mSampler->getSamples(), 1.0/atof(mFrame->getProperty("RenderTime")), mFrame->getProperty("RaysPerSec"));
+
 	}
 
 	static void Display() {
 		appGlut& app = *GetInstance();
-		//glPixelZoom (1 << app.mPixelation, 1 << app.mPixelation);
-		//glDrawPixels(app.mFrame->Width(), app.mFrame->Height(), GL_RGBA, GL_FLOAT, app.mFrame->Buffer());
-		//glFlush();
-		//glutSwapBuffers();
+		glPixelZoom (float(app.mWidth) / app.mFrame->Width(), float(app.mHeight) / app.mFrame->Height());
+		glDrawPixels(app.mFrame->Width(), app.mFrame->Height(), GL_RGBA, GL_FLOAT, app.mFrame->Buffer());
+		glFlush();
+		glutSwapBuffers();
 	}
 
 	static void Reshape(int width, int height) {
@@ -131,8 +133,11 @@ public:
 			app.mHeight = height;
 
 			char buff[32];
-			sprintf(buff, "smort [%d x %d]\n", width, height);
+			sprintf(buff, "smort [%d x %d * %d]", width, height, app.mSampler->getSamples());
 			glutSetWindowTitle(buff);
+
+			Display();
+			app.mNeedRender = true;
 		}
 	}
 
@@ -217,170 +222,172 @@ public:
 	}
 
 	static void Idle() {
-		appGlut& app = *GetInstance();
+		GetInstance()->OnIdle();
+	}
 
-		bool changed = false;
-		if (app.mKeyBuffer[0] || app.mKeyBuffer[1] || app.mKeyBuffer[2]) {
-			changed = true;
+	void OnIdle()
+	{
+		if (mKeyBuffer[0] || mKeyBuffer[1] || mKeyBuffer[2]) {
+			mNeedRender = true;
+			//mPixelation = 2;
+		} /*else if (mPixelation == 2) {
+			mNeedRender = true;
+			mPixelation = 0;
+		}*/
+
+		if (mKeyBuffer['w']) {
+			mCamera->mPosition += mCamera->mBase.w*real(0.5); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['w']) {
-			app.mCamera->mPosition += app.mCamera->mBase.w*real(0.5); changed = true;
+		if (mKeyBuffer['s']) {
+			mCamera->mPosition -= mCamera->mBase.w*real(0.5); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['s']) {
-			app.mCamera->mPosition -= app.mCamera->mBase.w*real(0.5); changed = true;
+		if (mKeyBuffer['a']) {
+			mCamera->mPosition -= mCamera->mBase.u*real(0.5); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['a']) {
-			app.mCamera->mPosition -= app.mCamera->mBase.u*real(0.5); changed = true;
+		if (mKeyBuffer['d']) {
+			mCamera->mPosition += mCamera->mBase.u*real(0.5); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['d']) {
-			app.mCamera->mPosition += app.mCamera->mBase.u*real(0.5); changed = true;
+		if (mKeyBuffer['r']) {
+			mCamera->mPosition += mCamera->mBase.v*real(0.5); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['r']) {
-			app.mCamera->mPosition += app.mCamera->mBase.v*real(0.5); changed = true;
-		}
-		if (app.mKeyBuffer['f']) {
-			app.mCamera->mPosition -= app.mCamera->mBase.v*real(0.5); changed = true;
+		if (mKeyBuffer['f']) {
+			mCamera->mPosition -= mCamera->mBase.v*real(0.5); mNeedRender = true;
 		}
 		//speed
-		if (app.mKeyBuffer['W']) {
-			app.mCamera->mPosition += app.mCamera->mBase.w*real(5.0); changed = true;
+		if (mKeyBuffer['W']) {
+			mCamera->mPosition += mCamera->mBase.w*real(5.0); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['S']) {
-			app.mCamera->mPosition -= app.mCamera->mBase.w*real(5.0); changed = true;
+		if (mKeyBuffer['S']) {
+			mCamera->mPosition -= mCamera->mBase.w*real(5.0); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['A']) {
-			app.mCamera->mPosition -= app.mCamera->mBase.u*real(5.0); changed = true;
+		if (mKeyBuffer['A']) {
+			mCamera->mPosition -= mCamera->mBase.u*real(5.0); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['D']) {
-			app.mCamera->mPosition += app.mCamera->mBase.u*real(5.0); changed = true;
+		if (mKeyBuffer['D']) {
+			mCamera->mPosition += mCamera->mBase.u*real(5.0); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['R']) {
-			app.mCamera->mPosition += app.mCamera->mBase.v*real(5.0); changed = true;
+		if (mKeyBuffer['R']) {
+			mCamera->mPosition += mCamera->mBase.v*real(5.0); mNeedRender = true;
 		}
-		if (app.mKeyBuffer['F']) {
-			app.mCamera->mPosition -= app.mCamera->mBase.v*real(5.0); changed = true;
+		if (mKeyBuffer['F']) {
+			mCamera->mPosition -= mCamera->mBase.v*real(5.0); mNeedRender = true;
 		}
 		//projection
-		if (app.mKeyBuffer['q']) {
-			app.mCamera->mDistance -= 0.1;
-			changed = true;
+		if (mKeyBuffer['q']) {
+			mCamera->mDistance -= 0.1;
+			mNeedRender = true;
 		}
-		if (app.mKeyBuffer['e']) {
-			app.mCamera->mDistance += 0.1;
-			changed = true;
+		if (mKeyBuffer['e']) {
+			mCamera->mDistance += 0.1;
+			mNeedRender = true;
 		}
 		//super sampling
-		if (app.mKeyBuffer['g']) {
-			if (app.mSampler->getSamples() > 1) {
-				app.mSampler->setSamples(app.mSampler->getSamples()-1);
-				changed = true;
-				app.mKeyBuffer['g'] = false;
+		if (mKeyBuffer['g']) {
+			if (mSampler->getSamples() > 1) {
+				mSampler->setSamples(mSampler->getSamples()-1);
+				mNeedRender = true;
+				mKeyBuffer['g'] = false;
 			}
 		}
-		if (app.mKeyBuffer['h']) {
-			if (app.mSampler->getSamples() < 5) {
-				app.mSampler->setSamples(app.mSampler->getSamples()+1);
-				changed = true;
-				app.mKeyBuffer['h'] = false;
+		if (mKeyBuffer['h']) {
+			if (mSampler->getSamples() < 5) {
+				mSampler->setSamples(mSampler->getSamples()+1);
+				mNeedRender = true;
+				mKeyBuffer['h'] = false;
 			}
 		}
 		//DoF
-		if (app.mKeyBuffer['p']) {
-			app.mCamera->mUseDoF = !app.mCamera->mUseDoF;
-			app.mKeyBuffer['p'] = false;
-			changed = true;
+		if (mKeyBuffer['p']) {
+			mCamera->mUseDoF = !mCamera->mUseDoF;
+			mKeyBuffer['p'] = false;
+			mNeedRender = true;
 		}
-		if (app.mKeyBuffer['[']) {
-			app.mCamera->mDofDistance -= 0.05;
-			changed = true;
+		if (mKeyBuffer['[']) {
+			mCamera->mDofDistance -= 0.05;
+			mNeedRender = true;
 		}
-		if (app.mKeyBuffer[']']) {
-			app.mCamera->mDofDistance += 0.05;
-			changed = true;
+		if (mKeyBuffer[']']) {
+			mCamera->mDofDistance += 0.05;
+			mNeedRender = true;
 		}
-		if (app.mKeyBuffer['-']) {
-			if (app.mCamera->mDofAperture > real(0)) {
-				app.mCamera->mDofAperture -= 0.01;
-				changed = true;
+		if (mKeyBuffer['-']) {
+			if (mCamera->mDofAperture > real(0)) {
+				mCamera->mDofAperture -= 0.01;
+				mNeedRender = true;
 			}
 		}
-		if (app.mKeyBuffer['=']) {
-			app.mCamera->mDofAperture += 0.01;
-			changed = true;
+		if (mKeyBuffer['=']) {
+			mCamera->mDofAperture += 0.01;
+			mNeedRender = true;
 			usleep(50000);
 		}
-		if (app.mKeyBuffer['b']) {
-			app.mSampler->setPostProcess(!app.mSampler->getPostProcess());
-			changed = true;
-			app.mKeyBuffer['b'] = false;
+		if (mKeyBuffer['b']) {
+			mSampler->setPostProcess(!mSampler->getPostProcess());
+			mNeedRender = true;
+			mKeyBuffer['b'] = false;
 		}
 
 
-		if (app.mKeyBuffer['n']) {
-			if (app.mPixelation > 0) {
-				app.mPixelation--;
-				changed = true;
-				app.mKeyBuffer['n'] = false;
+		if (mKeyBuffer['n']) {
+			if (mPixelation > 0) {
+				mPixelation--;
+				mNeedRender = true;
+				mKeyBuffer['n'] = false;
 			}
 		}
-		if (app.mKeyBuffer['m']) {
-			if (app.mPixelation < 4) {
-				app.mPixelation++;
-				changed = true;
-				app.mKeyBuffer['m'] = false;
+		if (mKeyBuffer['m']) {
+			if (mPixelation < 4) {
+				mPixelation++;
+				mNeedRender = true;
+				mKeyBuffer['m'] = false;
 			}
 		}
 
-		if (app.mKeyBuffer['t'] || app.mKeyBuffer['T']) {
+		if (mKeyBuffer['t'] || mKeyBuffer['T']) {
 			SKEL = new skel();
-			const int factor = 1 << app.mPixelation;
-			if (app.mKeyBuffer['t']) {
+			const int factor = 1 << mPixelation;
+			if (mKeyBuffer['t']) {
 				//for (int i = 0; i < 512; i++) {
-					Ray ray(app.mGeometry);
+					Ray ray(mGeometry);
 					rgba col;
-					app.mCamera->getRay(app.mPosX/factor, app.mPosY/factor, &ray);
-					app.mGeometry->Trace(ray, &col);
+					mCamera->getRay(mPosX/factor, mPosY/factor, &ray);
+					mGeometry->Trace(ray, &col);
 				//}
-			} else if (app.mKeyBuffer['T']) {
-				app.Render();
+			} else if (mKeyBuffer['T']) {
+				Render();
 			}
 			SKEL->save("trace.skel");
 			printf("Trace saved (%d lines)\n", SKEL->getLineCount());
 			delete SKEL;
 			SKEL = NULL;
-			app.mCamera->SaveSkel();
-			app.mKeyBuffer['t'] = false;
-			app.mKeyBuffer['T'] = false;
+			mCamera->SaveSkel();
+			mKeyBuffer['t'] = false;
+			mKeyBuffer['T'] = false;
 		}
 
-		if (app.mKeyBuffer['.']) {
+		if (mKeyBuffer['.']) {
 			if (NR_BOUNCES<20) {
 				NR_BOUNCES ++;
-				changed = true;
-				app.mKeyBuffer['.'] = false;
+				mNeedRender = true;
+				mKeyBuffer['.'] = false;
 			}
 		}
-		if (app.mKeyBuffer[',']) {
+		if (mKeyBuffer[',']) {
 			if (NR_BOUNCES>1) {
 				NR_BOUNCES --;
-				changed = true;
-				app.mKeyBuffer[','] = false;
+				mNeedRender = true;
+				mKeyBuffer[','] = false;
 			}
 		}
 
-		if (app.mKeyBuffer['u']) {
-			if(app.mSampler->getReportProgress()) {
-				app.mSampler->setReportProgress(false);
-			} else {
-				app.mSampler->setReportProgress(true);
-			}
-
-			//changed = true;
-			app.mKeyBuffer['u'] = false;
+		if (mKeyBuffer['u']) {
+			mSampler->setReportProgress(!mSampler->getReportProgress());
+			mKeyBuffer['u'] = false;
 		}
 
-		if (changed) {
-			app.Update();
+		if (mNeedRender) {
+			Update();
+			mNeedRender = false;
 		} else {
 			usleep(50000);
 		}
