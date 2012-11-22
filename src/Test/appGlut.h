@@ -30,10 +30,11 @@ public:
 		return inst;
 	}
 
-	void Run(int argc, char** argv, fsBase* sampler, camThinLens* cam, prBase* geom) {
+	void Run(int argc, char** argv, fsBase* sampler, camThinLens* cam, prBase* geom)
+	{
 		mPixelation	= 0;
-		mWidth		= 800;
-		mHeight		= 600;
+		mWidth		= 512;
+		mHeight		= 512;
 		mCamera		= cam;
 		mGeometry	= geom;
 		mSampler	= sampler;
@@ -114,7 +115,7 @@ public:
 
 		glDrawPixels(mFrame->Width(), mFrame->Height(), GL_RGBA, GL_FLOAT, mFrame->Buffer());
 		glutSwapBuffers();
-		printf("%d x %d, %d spp: %1.3f, %s RPS\n", mFrame->Width(), mFrame->Height(), mSampler->getSamples(), 1.0/atof(mFrame->getProperty("RenderTime")), mFrame->getProperty("RaysPerSec"));
+		printf("%d x %d, %d spp: %1.3f, %1.2f Mrays\n", mFrame->Width(), mFrame->Height(), mSampler->getSamples(), 1.0/atof(mFrame->getProperty("RenderTime")), atof(mFrame->getProperty("RaysPerSec"))/1000000);
 
 	}
 
@@ -133,7 +134,7 @@ public:
 			app.mHeight = height;
 
 			char buff[32];
-			sprintf(buff, "smort [%d x %d * %d]", width, height, app.mSampler->getSamples());
+			sprintf(buff, "O_oRT [%d x %d * %d]", width, height, app.mSampler->getSamples());
 			glutSetWindowTitle(buff);
 
 			Display();
