@@ -7,15 +7,18 @@ public:
 	Fixed() {}
 	Fixed(const Fixed& num)		: mData(num.mData) {}
 	Fixed(const int& num)		: mData(num << NSEED) {}
+	Fixed(const unsigned& num)	: mData(num << NSEED) {}
 	Fixed(const float& num)		: mData(num  *  SEED) {}
 	Fixed(const double& num)	: mData(num  *  SEED) {}
+	Fixed(const long double& num)	: mData(num  *  SEED) {}
 
-	operator int      (void) const				{	return mData.value >> NSEED;		}
-	operator float    (void) const				{	return float(mData.value)/SEED;		}
-	operator double   (void) const				{	return double(mData.value)/SEED;	}
-	operator bool     (void) const				{	return mData.value != 0;			}
+	operator int      () const				{	return mData.value >> NSEED;		}
+	operator unsigned () const				{	return mData.value >> NSEED;		}
+	operator float    () const				{	return float(mData.value)/SEED;		}
+	operator double   () const				{	return double(mData.value)/SEED;	}
+	operator bool     () const				{	return mData.value != 0;			}
 
-	float ToFloat     (void) const				{	return float(mData.value)/SEED;		}
+	float ToFloat     () const				{	return float(mData.value)/SEED;		}
 
 	Fixed operator << (unsigned n) const		{	return Fixed(data(mData.value << n));				}
 	Fixed operator >> (unsigned n) const		{	return Fixed(data(mData.value >> n));				}

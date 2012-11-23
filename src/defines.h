@@ -32,7 +32,7 @@ using namespace std;
 #define countof(arr) sizeof(arr)/sizeof(arr[0])
 
 //#define USE_FIXED
-//#define USE_TABLE_TRIGONOMETRY
+#define USE_TABLE_TRIGONOMETRY
 //#define USE_TABLE_RAND
 //#define USE_APPROX_POW
 //#define USE_FAST_SQRT
@@ -47,10 +47,10 @@ extern class skel* SKEL;
 
 #ifdef USE_FIXED
 	#include "fixed.h"
-	typedef Fixed<int32_t, int64_t, 20> real;
+	typedef Fixed<int32_t, int64_t, 16> real;
 #else
 	#include "floating.h"
-	typedef Floating<float> real;
+	typedef Floating<double> real;
 #endif
 
 typedef float channel;

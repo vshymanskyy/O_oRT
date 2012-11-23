@@ -64,7 +64,8 @@ int STAT_RAYS = 0;
 int NR_BOUNCES = 10;
 class skel* SKEL = NULL;
 
-void addQuad(sceneBase* scene, const vec3& a, const vec3& b, const vec3& c, const vec3& d, const shBase* shFront, const shBase* shBack) {
+void addQuad(sceneBase* scene, const vec3& a, const vec3& b, const vec3& c, const vec3& d, const shBase* shFront, const shBase* shBack)
+{
 	scene->Add(
 		new prTriangle(
 			a, b, c,
@@ -87,7 +88,8 @@ void addQuad(sceneBase* scene, const vec3& a, const vec3& b, const vec3& c, cons
 }
 
 
-void addBox(sceneBase* scene, const vec3& min, const vec3& max, const shBase* shFront, const shBase* shBack) {
+void addBox(sceneBase* scene, const vec3& min, const vec3& max, const shBase* shFront, const shBase* shBack)
+{
 	vec3 a( min.x, min.y, min.z);
 	vec3 b( min.x, min.y, max.z);
 	vec3 c( max.x, min.y, min.z);
@@ -109,7 +111,8 @@ void addBox(sceneBase* scene, const vec3& min, const vec3& max, const shBase* sh
 }
 
 
-void addTetraHedron(sceneBase* scene, const vec3& a, const vec3& b, const vec3& c, const vec3& d, const shBase* shFront, const shBase* shBack) {
+void addTetraHedron(sceneBase* scene, const vec3& a, const vec3& b, const vec3& c, const vec3& d, const shBase* shFront, const shBase* shBack)
+{
 	scene->Add(
 		new prTriangle(
 			a, b, c,
@@ -158,7 +161,8 @@ void onAbort(int param) {
 	exit(0);
 }
 
-int main(int argc, char** args) {
+int main(int argc, char** args)
+{
 	cMath::Init();
 	cRandom::Init();
 
@@ -166,13 +170,14 @@ int main(int argc, char** args) {
 	signal(SIGTERM, onAbort);
 	signal(SIGINT,  onAbort);
 
-	shRaster* face = new shRaster("face.png");
+	//shRaster* face = new shRaster("./data/images/Conc2.jpg");
 
 	sceneBruteForce* a = new sceneBruteForce(
 	//	new envConst(1.0)
 	//	new envCubic( new shConst(1.0, 0.0, 0.0), new shConst(0.0, 1.0, 0.0), new shConst(0.0, 0.0, 1.0), new shConst(1.0, 1.0, 0.0), new shConst(1.0, 0.0, 1.0), new shConst(0.0, 1.0, 1.0))
-		new envCubic(face, face, face, face, face, face)
-	//	new envSphericLanLon(new shHdrImage("/media/Transcend/Resources/environments/equirectangular/OpenfootageNET_Beach_CavalinoItalyHigh.hdr"))
+	//	new envCubic(face, face, face, face, face, face)
+	//	new envSpheric(new shRaster(""))
+		new envSphericLanLon(new shHdrImage("./data/environ/equirect/20060430-01_hd.hdr"))
 	);
 
 
@@ -227,7 +232,7 @@ int main(int argc, char** args) {
 	a->Add(new prSphere(centers[pos++], radius, new shMarble(new shPerlinImproved(), 0, 4, 3)));
 	a->Add(new prSphere(centers[pos++], radius, new shBlend(new shConst(1.0), new shReflect(new shConst(0.8)), new shPerlinImproved())));
 	a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.8), new shAdd(new shAbs(new shPerlin()), new shConst(1.0)))));
-	a->Add(new prSphere(centers[pos++], radius, new modGlossy(new shMirror(new shConst(0.8)), new shConst(0.05))));
+	a->Add(new prSphere(centers[pos++], radius, new modGlossy(new shMirror(new shConst(0.8)), new shConst(0.01))));
 	a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.8, 0.8, 0.8), new shBlend(new shConst(1.3), new shConst(1.7), new shAbs(new shPerlinImproved())))));
 	a->Add(new prSphere(centers[pos++], radius, new shGlass(new shConst(0.85, 0.85, 0.85), new shAdd(new shAbs(new shPerlin()), new shConst(1.0)))));
 	a->Add(new prSphere(centers[pos++], radius, new shMirror(new shBlend(new shConst(0.8), new shConst(0.4), new shCheckered(1.0, 1.0)))));
